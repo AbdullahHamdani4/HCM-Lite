@@ -26,8 +26,8 @@ export function AiPanel({ open, onClose, role }) {
     setText("");
     setBusy(true);
     try {
-      const { answer } = await api("/api/ai/chat", { method: "POST", body: { messages: next } });
-      setMsgs([...next, { role: "assistant", content: answer }]);
+      const { answer, fallback, detail } = await api("/api/ai/chat", { method: "POST", body: { messages: next } });
+      setMsgs([...next, fallback ? { role: "assistant", content: `${answer}${detail ? `\n${detail}` : ""}`, error: true } : { role: "assistant", content: answer }]);
     } catch (e) {
       setMsgs([...next, { role: "assistant", content: e.message, error: true }]);
     }

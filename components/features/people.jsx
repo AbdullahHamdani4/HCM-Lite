@@ -295,6 +295,7 @@ export function PayrollView({ role }) {
   const [month, setMonth] = useState(todayPK().slice(0, 7));
   const slips = useApi(`/api/payslips?month=${month}`);
   const [busy, setBusy] = useState(false);
+  const [confirming, setConfirming] = useState(false);
   const run = (runs.data ?? []).find((r) => r.month === month);
   const locked = run?.status === "finalized";
 
@@ -304,7 +305,10 @@ export function PayrollView({ role }) {
     setBusy(false);
   };
   const create = () => act(() => api("/api/payroll", { method: "POST", body: { month } }), run ? "Draft recalculated" : "Draft created");
-  const finalize = () => confirm(`Finalize ${month}? This locks the month for good.`) && act(() => api("/api/payroll", { method: "PATCH", body: { month, action: "finalize" } }), "Payroll finalized and locked");
+  const finalize = async () => {
+    await act(() => api("/api/payroll", { method: "PATCH", body: { month, action: "finalize" } }), "Payroll finalized and locked. Payslips are released.");
+    setConfirming(false);
+  };
 
   return (
     <>
@@ -313,7 +317,7 @@ export function PayrollView({ role }) {
         actions={<>
           <Input type="month" value={month} onChange={(e) => setMonth(e.target.value)} className="w-40" />
           {role === "hr" && <Button variant="primary" loading={busy} disabled={locked} onClick={create}>{run ? "Recalculate draft" : "Run payroll"}</Button>}
-          {role === "admin" && run && !locked && <Button variant="primary" loading={busy} onClick={finalize}>Finalize & lock</Button>}
+          {role === "admin" && run && !locked && <Button variant="primary" loading={busy} onClick={() => setConfirming(true)}>Finalize & lock</Button>}
         </>} />
       <StatRow>
         <Stat label="Gross cost" value={run ? pkr(run.totalGross) : "—"} loading={runs.loading} />
@@ -342,6 +346,15 @@ export function PayrollView({ role }) {
           </Table>
         )}
       </Card>
+      <p className="text-[12px] text-muted mt-3 max-w-3xl">
+        Gross = 1.5 × basic (HRA 40% + medical 10%). Deductions = (absent + unpaid leave + 0.5 × half days) × gross ÷ working days; joiners and leavers are prorated.
+        Monthly tax = annual tax on gross × 12 ÷ 12, using the slab: 0 up to 600k · 5% over 600k up to 1.2M · 30k + 15% up to 2.4M · 210k + 25% up to 3.6M · 510k + 35% above.
+      </p>
+      <Modal open={confirming} onClose={() => setConfirming(false)} title={`Finalize ${month}?`}
+        desc="This locks the month. Payslips are released to employees and nobody can change this run afterwards."
+        footer={<><Button onClick={() => setConfirming(false)}>Cancel</Button><Button variant="primary" loading={busy} onClick={finalize}>Finalize & lock</Button></>}>
+        {run && <p className="text-[13px]"><span className="num">{run.employees}</span> employees · gross <span className="num">{pkr(run.totalGross)}</span> · net <span className="num">{pkr(run.totalNet)}</span></p>}
+      </Modal>
     </>
   );
 }

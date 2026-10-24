@@ -39,7 +39,7 @@ function AiSummary({ kpis, extra }) {
     setState({ bullets: null, busy: true });
     try {
       const r = await api("/api/ai/summary", { method: "POST", body: { kpis: { ...kpis, ...extra } } });
-      if (r.fallback || !r.bullets.length) toast.error("Summary is unavailable right now. The numbers above are still live.");
+      if (r.fallback || !r.bullets.length) toast.error(`Summary is unavailable right now. ${r.detail ?? ""}`.trim(), { duration: 8000 });
       setState({ bullets: r.bullets, busy: false });
     } catch (e) {
       toast.error(e.message);

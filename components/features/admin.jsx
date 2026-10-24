@@ -82,6 +82,7 @@ function OrgList({ kind }) {
   const { data, loading, error, reload } = useApi(`/api/org?kind=${kind}`);
   const [f, setF] = useState({});
   const [busy, setBusy] = useState(false);
+  const [armed, setArmed] = useState(null);
   useEffect(() => setF({}), [kind]);
 
   const add = async (e) => {
@@ -91,8 +92,9 @@ function OrgList({ kind }) {
     setBusy(false);
   };
   const del = async (id) => {
-    if (!confirm("Remove this item?")) return;
-    try { await api(`/api/org?kind=${kind}&id=${id}`, { method: "DELETE" }); reload(); } catch (err) { toast.error(err.message); }
+    if (armed !== id) return setArmed(id);
+    setArmed(null);
+    try { await api(`/api/org?kind=${kind}&id=${id}`, { method: "DELETE" }); toast.success("Removed"); reload(); } catch (err) { toast.error(err.message); }
   };
 
   return (
@@ -113,7 +115,9 @@ function OrgList({ kind }) {
               {kind === "leaveTypes" && <span className="num text-muted">{r.quota == null ? "Unlimited" : `${r.quota} days / yr`}</span>}
               {kind === "leaveTypes" && !r.paid && <Badge>unpaid</Badge>}
               {kind === "holidays" && <span className="num text-muted">{fmtDate(r.date)}</span>}
-              <button onClick={() => del(r.id)} className="p-1 text-muted opacity-0 group-hover:opacity-100 hover:text-bad transition-opacity"><Trash2 size={14} strokeWidth={1.5} /></button>
+              {armed === r.id
+                ? <Button size="sm" variant="danger" onClick={() => del(r.id)}>Confirm remove</Button>
+                : <button onClick={() => del(r.id)} title="Remove" className="p-1 text-muted sm:opacity-0 group-hover:opacity-100 hover:text-bad transition-opacity"><Trash2 size={14} strokeWidth={1.5} /></button>}
             </div>
           ))}
         </div>
@@ -211,7 +215,7 @@ export function AuditView() {
                 <Td className="num text-muted">{new Date(a.at).toLocaleString("en-GB", { dateStyle: "short", timeStyle: "short" })}</Td>
                 <Td>{a.actorName} <Badge className="ml-1">{a.actorRole}</Badge></Td>
                 <Td>{a.action.replace(/_/g, " ")}</Td>
-                <Td className="text-muted">{a.entity} <span className="num text-[11px]">{String(a.entityId).slice(0, 10)}</span></Td>
+                <Td className="text-muted">{a.entity} <span className="text-fg">{a.after?.name ?? a.before?.name ?? a.after?.companyName ?? (a.entity === "payroll" ? a.entityId : "")}</span></Td>
                 <Td className="text-right">{(a.before || a.after) && <Button size="sm" variant="ghost" onClick={() => setOpen(a)}>Diff</Button>}</Td>
               </tr>
             ))}

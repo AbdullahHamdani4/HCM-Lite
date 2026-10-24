@@ -25,6 +25,8 @@ export const POST = route(["admin"], async (ctx, req, url) => {
   const kind = kindOf(url);
   const b = await body(req);
   const data = clean(kind, b);
+  const dup = (await listOrg(kind)).find((x) => x.id !== b.id && (kind === "holidays" ? x.date === data.date : x.name.trim().toLowerCase() === data.name.trim().toLowerCase()));
+  if (dup) throw new HttpError(409, `${dup.name} already exists`);
   const ref = b.id ? db().collection(kind).doc(b.id) : db().collection(kind).doc();
   await ref.set(data, { merge: true });
   await audit(ctx, b.id ? "update" : "create", kind, ref.id, null, data);

@@ -33,6 +33,7 @@ export function PreviewPanel() {
   const tone = { present: "text-ok bg-ok-bg", late: "text-warn bg-warn-bg", "on leave": "text-info bg-info-bg" };
   return (
     <div className="space-y-3 rise" style={{ animationDelay: "120ms" }}>
+      <p className="text-[11px] text-muted uppercase tracking-wider">Product preview · sample data</p>
       <div className="rounded-[10px] border border-border bg-bg p-4">
         <p className="text-[11px] text-muted uppercase tracking-wider">Who is on leave today?</p>
         <p className="text-[13px] mt-2">1 person — Sana Raza, casual leave until Friday.</p>

@@ -13,7 +13,7 @@ function Clockface() {
   return <p className="serif text-[56px] leading-none num">{now ? now.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Karachi" }) : "--:--"}</p>;
 }
 
-function CheckInCard({ today, onDone }) {
+function CheckInCard({ today, dayOff, onDone }) {
   const [busy, setBusy] = useState(false);
   const go = async (action) => {
     setBusy(true);
@@ -24,7 +24,7 @@ function CheckInCard({ today, onDone }) {
     } catch (e) { toast.error(e.message); }
     setBusy(false);
   };
-  const state = !today ? "out" : today.checkOut ? "done" : "in";
+  const state = dayOff && !today ? "off" : !today ? "out" : today.checkOut ? "done" : "in";
   return (
     <Card className="p-5 flex flex-col justify-between gap-6 rise">
       <div className="flex items-start justify-between">
@@ -38,6 +38,7 @@ function CheckInCard({ today, onDone }) {
         <div><p className="text-[12px] text-muted">Checked in</p><p className="num mt-0.5">{fmtTime(today?.checkIn)}</p></div>
         <div><p className="text-[12px] text-muted">Checked out</p><p className="num mt-0.5">{fmtTime(today?.checkOut)}</p></div>
       </div>
+      {state === "off" && <p className="text-[13px] text-muted h-10 flex items-center">Day off — enjoy your weekend. Check-in opens on the next working day.</p>}
       {state === "out" && <Button variant="primary" size="lg" loading={busy} onClick={() => go("in")}><LogIn size={15} /> Check in</Button>}
       {state === "in" && <Button variant="dark" size="lg" loading={busy} onClick={() => go("out")}><LogOut size={15} /> Check out</Button>}
       {state === "done" && <p className="text-[13px] text-muted h-10 flex items-center">Done for today · {(today.workedMin / 60).toFixed(1)} hours</p>}
@@ -55,7 +56,7 @@ export function EmployeeHome() {
       <PageHeader eyebrow={user.companyName} title={`Hi, ${user.name.split(" ")[0]}.`} desc="Your day, your time off and your pay — all in one place." />
       {error && <ErrorState message={error} onRetry={reload} />}
       <div className="grid lg:grid-cols-[1fr_1.4fr] gap-6">
-        {loading ? <Skeleton className="h-80 rounded-[10px]" /> : <CheckInCard today={data?.today} onDone={reload} />}
+        {loading ? <Skeleton className="h-80 rounded-[10px]" /> : <CheckInCard today={data?.today} dayOff={data?.dayOff} onDone={reload} />}
         <div className="grid grid-cols-2 gap-6 content-start">
           <Card className="p-5 col-span-2 rise">
             <div className="flex items-baseline justify-between">
@@ -194,7 +195,7 @@ export function MyLeave() {
     setParsing(true);
     try {
       const r = await api("/api/ai/leave", { method: "POST", body: { text } });
-      if (r.fallback) { toast.message("Couldn't read that — please fill the form."); setForm(blank); setAiFilled(false); }
+      if (r.fallback) { toast.error(`Couldn't fill it automatically${r.detail ? ` — ${r.detail}` : ""}. Please use the form.`, { duration: 8000 }); setForm({ ...blank, reason: text }); setAiFilled(false); }
       else { setForm({ typeId: r.typeId, start: r.start, end: r.end, reason: r.reason }); setAiFilled(true); }
     } catch (err) { toast.error(err.message); setForm(blank); }
     setParsing(false);
