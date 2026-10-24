@@ -1,6 +1,6 @@
 # HCM Lite
 
-AI-assisted Human Capital Management for **Admin, HR and Employees**. Built for the Saylani Hackathon (24 Oct 2026).
+AI-assisted Human Capital Management for **Admin, HR and Employees**.
 The app starts empty: Admin sets up the company, HR registers employees, and every number comes from what people do in the app.
 
 ## Stack

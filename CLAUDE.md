@@ -1,4 +1,4 @@
-# HCM Lite — Saylani Hackathon (solo, 2–4 h)
+# HCM Lite
 
 AI-assisted HR system with 3 roles: Admin, HR, Employee. The app starts EMPTY (no seed or dummy data). Judges run the demo script below on the live link.
 

@@ -17,7 +17,7 @@ export function AuthShell({ step, title, desc, children, aside }) {
             {children}
           </div>
         </div>
-        <p className="text-[12px] text-muted">Saylani Hackathon · 2026</p>
+        <p className="text-[12px] text-muted">© HCM Lite</p>
       </div>
       <div className="hidden lg:flex relative overflow-hidden border-l border-border bg-surface">
         <div className="absolute inset-0 opacity-[0.5]" style={{ backgroundImage: "linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px)", backgroundSize: "48px 48px", maskImage: "radial-gradient(ellipse at 60% 40%, black 20%, transparent 75%)" }} />
