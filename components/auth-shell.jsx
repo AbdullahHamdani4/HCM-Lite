@@ -27,33 +27,29 @@ export function AuthShell({ step, title, desc, children, aside }) {
   );
 }
 
-/** A static product preview — real UI pieces, not a stock illustration. */
+/** Brand panel: what HCM Lite is, no fake numbers. */
 export function PreviewPanel() {
-  const rows = [["Ayesha Khan", "Engineering", "09:02", "present"], ["Bilal Ahmed", "Finance", "09:21", "late"], ["Sana Raza", "Design", "—", "on leave"]];
-  const tone = { present: "text-ok bg-ok-bg", late: "text-warn bg-warn-bg", "on leave": "text-info bg-info-bg" };
+  const points = [
+    ["01", "Attendance", "Server-stamped check-in with late, half-day and absence rules."],
+    ["02", "Leave", "Balances, overlap and holiday checks, one-click approvals."],
+    ["03", "Payroll", "Monthly runs with tax, deductions and PDF payslips."],
+    ["04", "Assistant", "Ask questions in plain words. Answers come from your own records."],
+  ];
   return (
-    <div className="space-y-3 rise" style={{ animationDelay: "120ms" }}>
-      <p className="text-[11px] text-muted uppercase tracking-wider">Product preview · sample data</p>
-      <div className="rounded-[10px] border border-border bg-bg p-4">
-        <p className="text-[11px] text-muted uppercase tracking-wider">Who is on leave today?</p>
-        <p className="text-[13px] mt-2">1 person — Sana Raza, casual leave until Friday.</p>
-        <p className="text-[11px] text-muted mt-2">AI-generated · from today&apos;s records</p>
-      </div>
-      <div className="grid grid-cols-3 rounded-[10px] border border-border bg-bg divide-x divide-border">
-        {[["Present", "42"], ["On leave", "5"], ["Late", "3"]].map(([k, v]) => (
-          <div key={k} className="p-4"><p className="text-[11px] text-muted">{k}</p><p className="serif text-[32px] leading-none mt-2 num">{v}</p></div>
-        ))}
-      </div>
-      <div className="rounded-[10px] border border-border bg-bg divide-y divide-border">
-        {rows.map(([n, d, t, s]) => (
-          <div key={n} className="flex items-center gap-3 px-4 h-11 text-[12px]">
-            <span className="size-6 rounded-full bg-subtle grid place-items-center text-[10px] text-muted">{n.split(" ").map((x) => x[0]).join("")}</span>
-            <span className="flex-1">{n}<span className="text-muted ml-2">{d}</span></span>
-            <span className="num text-muted">{t}</span>
-            <span className={`px-1.5 h-5 leading-5 rounded-[4px] text-[11px] ${tone[s]}`}>{s}</span>
+    <div className="rise" style={{ animationDelay: "120ms" }}>
+      <div className="w-8 h-[3px] bg-accent mb-6" />
+      <h2 className="serif text-[52px] leading-[1.02]">People operations,<br />without the paperwork.</h2>
+      <p className="text-[14px] text-muted mt-4 max-w-md">One place for Admin, HR and every employee — from the first check-in to the monthly payslip.</p>
+      <div className="mt-10 border-t border-border">
+        {points.map(([n, t, d]) => (
+          <div key={n} className="grid grid-cols-[40px_110px_1fr] gap-3 py-4 border-b border-border text-[13px]">
+            <span className="num text-muted">{n}</span>
+            <span className="font-medium">{t}</span>
+            <span className="text-muted">{d}</span>
           </div>
         ))}
       </div>
+      <p className="text-[12px] text-muted mt-6">Admin · HR · Employee</p>
     </div>
   );
 }
